@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-import notion
 from llm import LLaMA
+import notion
 
 app = Flask(__name__)
 
@@ -19,21 +19,21 @@ def chat():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'OK'}), 200, {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'}
     
-    user_input = request.json['input']
-    
-    if 'mine' in user_input.lower() or 'my' in user_input.lower():
-        # Retrieve relevant data from Notion database
-        notion_data = notion_client.get_page(NOTION_PAGE_ID)
-        final_response = f"Notion data: {notion_data}"
-    elif 'search' in user_input.lower():
-        # Trigger a web search
-        final_response = web_search(user_input)
-    else:
-        # Use LLaMA model to generate response
-        response = llama_client.generate(text=user_input)
-        final_response = response
-    
-    return jsonify({'response': final_response}), 200, {'Access-Control-Allow-Origin': '*'}
+    try:
+        user_input = request.json['input']
+        
+        if 'mine' in user_input.lower() or 'my' in user_input.lower():
+            notion_data = notion_client.get_page(NOTION_PAGE_ID)
+            final_response = f"Notion data: {notion_data}"
+        elif 'search' in user_input.lower():
+            final_response = web_search(user_input)
+        else:
+            response = llama_client.generate(text=user_input)
+            final_response = response
+        
+        return jsonify({'response': final_response}), 200, {'Access-Control-Allow-Origin': '*'}
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500, {'Access-Control-Allow-Origin': '*'}
 
 if __name__ == '__main__':
     app.run(debug=True)
