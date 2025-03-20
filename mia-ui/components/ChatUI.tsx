@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, FlatList, Text, StyleSheet } from 'react-native';
+import { View, TextInput, Button, FlatList, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 
 export default function ChatUI() {
   const [messages, setMessages] = useState([]);
@@ -33,24 +33,32 @@ export default function ChatUI() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
       <FlatList
         data={messages}
         renderItem={({ item }) => (
-          <Text style={item.sender === 'user' ? styles.userMessage : styles.botMessage}>
-            {item.text}
-          </Text>
+          <View style={item.sender === 'user' ? styles.userMessageContainer : styles.botMessageContainer}>
+            <Text style={item.sender === 'user' ? styles.userMessage : styles.botMessage}>
+              {item.text}
+            </Text>
+          </View>
         )}
         keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.messagesContainer}
       />
-      <TextInput
-        style={styles.input}
-        value={input}
-        onChangeText={setInput}
-        placeholder="Type your message..."
-      />
-      <Button title="Send" onPress={sendMessage} />
-    </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={input}
+          onChangeText={setInput}
+          placeholder="Type your message..."
+        />
+        <Button title="Send" onPress={sendMessage} />
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -58,26 +66,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
   },
-  userMessage: {
+  messagesContainer: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
+  userMessageContainer: {
     alignSelf: 'flex-end',
     backgroundColor: '#DCF8C6',
     padding: 8,
     borderRadius: 8,
     marginVertical: 4,
+    maxWidth: '80%',
   },
-  botMessage: {
+  botMessageContainer: {
     alignSelf: 'flex-start',
     backgroundColor: '#ECECEC',
     padding: 8,
     borderRadius: 8,
     marginVertical: 4,
+    maxWidth: '80%',
+  },
+  userMessage: {
+    color: '#000',
+  },
+  botMessage: {
+    color: '#000',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderColor: '#CCC',
+    padding: 8,
   },
   input: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#CCC',
     padding: 8,
     borderRadius: 8,
-    marginVertical: 8,
+    marginRight: 8,
   },
 });
