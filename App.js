@@ -1,31 +1,40 @@
 import React, { useState } from 'react';
-import { StreamChat } from 'stream-chat';
-import { Chat } from 'stream-chat-react';
-import 'stream-chat-css';
-
-const api_key = 'YOUR_API_KEY';
-const user_id = 'YOUR_USER_ID';
-const user_token = 'YOUR_USER_TOKEN';
-
-const chatClient = StreamChat.getInstance(api_key);
-
-const user = {
-  id: user_id,
-  name: 'Your Name',
-};
-
-chatClient.connectUser(user, user_token);
-
-const channel = chatClient.channel('messaging', 'general', {
-  name: 'General',
-});
+import axios from 'axios';
 
 function App() {
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+
+  const handleSendMessage = async () => {
+    const response = await axios.post('/api/chat', { input: newMessage });
+    setMessages([...messages, { user: newMessage, response: response.data.response }]);
+    setNewMessage('');
+  };
+
   return (
     <div className="app-container">
-      <Chat client={chatClient} theme="messaging light">
-        <channel.Channel channel={channel} />
-      </Chat>
+      <div className="chat-container">
+        <div className="chat-header">
+          <h2>Chat Interface</h2>
+        </div>
+        <div className="chat-messages">
+          {messages.map((message, index) => (
+            <div key={index} className="message">
+              <span className="user-message">{message.user}</span>
+              <span className="response-message">{message.response}</span>
+            </div>
+          ))}
+        </div>
+        <div className="chat-input">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+          />
+          <button onClick={handleSendMessage}>Send</button>
+        </div>
+      </div>
     </div>
   );
 }
