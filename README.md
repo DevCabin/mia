@@ -56,5 +56,6 @@ This project is a web application that integrates a chatbot using the LLaMA lang
 
 ## Example
 
+
 ```sh
 curl -X POST https://<your-vercel-deployment-url>/api/chat -H "Content-Type: application/json" -d '{"input": "Hello, chatbot!"}'
