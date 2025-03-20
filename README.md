@@ -54,12 +54,18 @@ This project is a Flask-based web application that integrates a chatbot using th
 
 2. Set up environment variables in Vercel for the Notion API token, LLaMA API key, and Notion page ID.
 
-3. Start the Expo app:
+3. Build the Expo app for the web:
     ```sh
-    npx expo start
+    cd mia-ui
+    npx expo export
     ```
 
-4. Open the Expo app on your device or simulator and interact with the chatbot.
+4. Deploy the web build to Vercel:
+    ```sh
+    vercel
+    ```
+
+5. Open the provided URL in your web browser and interact with the chatbot.
 
 ## Example
 

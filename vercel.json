@@ -2,14 +2,22 @@
   "version": 2,
   "builds": [
     {
+      "src": "mia-ui/dist/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "app.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "mia-ui/dist/$1"
     }
   ]
 }
