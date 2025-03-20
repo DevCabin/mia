@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
 function App() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
-  const handleSendMessage = async () => {
-    const response = await axios.post('/api/chat', { input: newMessage });
-    setMessages([...messages, { user: newMessage, response: response.data.response }]);
+  const handleSendMessage = () => {
+    setMessages([...messages, { user: newMessage }]);
     setNewMessage('');
   };
 
@@ -21,7 +19,6 @@ function App() {
           {messages.map((message, index) => (
             <div key={index} className="message">
               <span className="user-message">{message.user}</span>
-              <span className="response-message">{message.response}</span>
             </div>
           ))}
         </div>
