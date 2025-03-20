@@ -8,6 +8,7 @@ This project is a Flask-based web application that integrates a chatbot using th
 - **Notion API Integration**: Retrieves relevant data from a Notion database to enhance the chatbot's responses.
 - **Web Search**: Performs web searches for queries that require external information.
 - **CORS Handling**: Supports Cross-Origin Resource Sharing (CORS) for the `/chat` endpoint.
+- **UI Chat App**: An Expo-based React Native app for interacting with the chatbot.
 
 ## Requirements
 
@@ -15,6 +16,8 @@ This project is a Flask-based web application that integrates a chatbot using th
 - Flask
 - Notion API client
 - LLaMA model client
+- Node.js
+- Expo CLI
 
 ## Installation
 
@@ -24,7 +27,7 @@ This project is a Flask-based web application that integrates a chatbot using th
     cd mia
     ```
 
-2. Install the required dependencies:
+2. Install the required dependencies for the Flask app:
     ```sh
     pip install -r requirements.txt
     ```
@@ -36,23 +39,27 @@ This project is a Flask-based web application that integrates a chatbot using th
     export NOTION_PAGE_ID=your_notion_page_id
     ```
 
+4. Install the required dependencies for the Expo app:
+    ```sh
+    cd mia-ui
+    npm install
+    ```
+
 ## Usage
 
-1. Deploy the application to Vercel:
+1. Deploy the Flask application to Vercel:
     ```sh
     vercel
     ```
 
 2. Set up environment variables in Vercel for the Notion API token, LLaMA API key, and Notion page ID.
 
-3. Send a POST request to the `/chat` endpoint with a JSON payload containing an `input` field:
-    ```json
-    {
-      "input": "Your message here"
-    }
+3. Start the Expo app:
+    ```sh
+    npx expo start
     ```
 
-4. The application will respond with a JSON object containing the generated response, data from the Notion page, or web search results.
+4. Open the Expo app on your device or simulator and interact with the chatbot.
 
 ## Example
 

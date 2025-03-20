@@ -11,7 +11,7 @@ export default function ChatUI() {
       setMessages((prevMessages) => [...prevMessages, userMessage]);
 
       try {
-        const response = await fetch('/chat', {
+        const response = await fetch('https://<your-vercel-deployment-url>/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ input }),
