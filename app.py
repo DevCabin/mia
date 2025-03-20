@@ -1,54 +1,83 @@
-from flask import Flask, request, jsonify
-from llm import LLaMA
-import notion
-import logging
-import os
+import React, { useState } from 'react';
+import { View, TextInput, Button, FlatList, Text, StyleSheet } from 'react-native';
 
-app = Flask(__name__)
+export default function ChatUI() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
 
-# Initialize Notion API client
-NOTION_API_TOKEN = os.getenv('NOTION_API_TOKEN')
-NOTION_PAGE_ID = os.getenv('NOTION_PAGE_ID')
-notion_client = notion.Client(auth=NOTION_API_TOKEN)
+  const sendMessage = async () => {
+    if (input.trim()) {
+      const userMessage = { text: input, sender: 'user' };
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-# Initialize LLaMA model client
-LLAMA_API_KEY = os.getenv('LLAMA_API_KEY')
-llama_client = LLaMA(API_KEY=LLAMA_API_KEY)
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input }),
+        });
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
 
-def web_search(query):
-    # Placeholder function for web search
-    return f"Search results for '{query}'"
+        const data = await response.json();
+        const botMessage = { text: data.response, sender: 'bot' };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+      } catch (error) {
+        console.error('Error sending message:', error);
+      } finally {
+        setInput('');
+      }
+    }
+  };
 
-@app.route('/')
-def index():
-    return "Welcome to the Chatbot API!"
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={messages}
+        renderItem={({ item }) => (
+          <Text style={item.sender === 'user' ? styles.userMessage : styles.botMessage}>
+            {item.text}
+          </Text>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
+      <TextInput
+        style={styles.input}
+        value={input}
+        onChangeText={setInput}
+        placeholder="Type your message..."
+      />
+      <Button title="Send" onPress={sendMessage} />
+    </View>
+  );
+}
 
-@app.route('/chat', methods=['POST', 'OPTIONS'])
-def chat():
-    if request.method == 'OPTIONS':
-        return jsonify({'message': 'OK'}), 200, {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'}
-    
-    try:
-        user_input = request.json['input']
-        logging.info(f"Received input: {user_input}")
-        
-        if 'mine' in user_input.lower() or 'my' in user_input.lower():
-            notion_data = notion_client.get_page(NOTION_PAGE_ID)
-            final_response = f"Notion data: {notion_data}"
-        elif 'search' in user_input.lower():
-            final_response = web_search(user_input)
-        else:
-            response = llama_client.generate(text=user_input)
-            final_response = response
-        
-        logging.info(f"Generated response: {final_response}")
-        return jsonify({'response': final_response}), 200, {'Access-Control-Allow-Origin': '*'}
-    except Exception as e:
-        logging.error(f"Error: {str(e)}")
-        return jsonify({'error': str(e)}), 500, {'Access-Control-Allow-Origin': '*'}
-
-if __name__ == '__main__':
-    app.run(debug=True)
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  userMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#DCF8C6',
+    padding: 8,
+    borderRadius: 8,
+    marginVertical: 4,
+  },
+  botMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#ECECEC',
+    padding: 8,
+    borderRadius: 8,
+    marginVertical: 4,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#CCC',
+    padding: 8,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+});
