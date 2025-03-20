@@ -8,17 +8,27 @@ export default function ChatUI() {
   const sendMessage = async () => {
     if (input.trim()) {
       const userMessage = { text: input, sender: 'user' };
-      setMessages([...messages, userMessage]);
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-      const response = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input }),
-      });
-      const data = await response.json();
-      const botMessage = { text: data.response, sender: 'bot' };
-      setMessages([...messages, userMessage, botMessage]);
-      setInput('');
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const botMessage = { text: data.response, sender: 'bot' };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+      } catch (error) {
+        console.error('Error sending message:', error);
+      } finally {
+        setInput('');
+      }
     }
   };
 

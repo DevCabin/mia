@@ -14,6 +14,10 @@ def web_search(query):
     # Placeholder function for web search
     return f"Search results for '{query}'"
 
+@app.route('/')
+def index():
+    return "Welcome to the Chatbot API!"
+
 @app.route('/chat', methods=['POST', 'OPTIONS'])
 def chat():
     if request.method == 'OPTIONS':
